@@ -25,10 +25,10 @@ class NetflowCollectorManager(base.Manager):
     resource_class = NetflowCollector
 
     def get(self, collector):
-        return self._get('/config/netflowcollector/%s' % get_id(collector))
+        return self._get('/config/netflowcollector/%s' % base.get_id(collector))
 
     def delete(self, collector):
-        return self._delete('/config/netflowcollector/%s' % get_id(collector))
+        return self._delete('/config/netflowcollector/%s' % base.get_id(collector))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

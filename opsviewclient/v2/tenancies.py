@@ -25,10 +25,10 @@ class TenancyManager(base.Manager):
     resource_class = Tenancy
 
     def get(self, tenancy):
-        return self._get('/config/tenancy/%s' % get_id(tenancy))
+        return self._get('/config/tenancy/%s' % base.get_id(tenancy))
 
     def delete(self, tenancy):
-        return self._delete('/config/tenancy/%s' % get_id(tenancy))
+        return self._delete('/config/tenancy/%s' % base.get_id(tenancy))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

@@ -28,7 +28,7 @@ class HostTemplateManager(base.Manager):
     resource_class = HostTemplate
 
     def get(self, template):
-        return self._get('/config/hosttemplate/%s' % get_id(template))
+        return self._get('/config/hosttemplate/%s' % base.get_id(template))
 
     def create(self, name, description=None, hosts=None, managementurls=None,
                servicechecks=None):
@@ -67,10 +67,10 @@ class HostTemplateManager(base.Manager):
     def update(self, template, **kwds):
         body = template._info
         body.update(kwds)
-        self._update('/config/hosttemplate/%s' % get_id(template), body=body)
+        self._update('/config/hosttemplate/%s' % base.get_id(template), body=body)
 
     def delete(self, template):
-        return self._delete('/config/hosttemplate/%s' % get_id(template))
+        return self._delete('/config/hosttemplate/%s' % base.get_id(template))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

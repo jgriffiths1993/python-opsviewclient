@@ -25,10 +25,10 @@ class KeywordManager(base.Manager):
     resource_class = Keyword
 
     def get(self, keyword):
-        return self._get('/config/keyword/%s' % get_id(keyword))
+        return self._get('/config/keyword/%s' % base.get_id(keyword))
 
     def delete(self, keyword):
-        return self._delete('/config/keyword/%s' % get_id(keyword))
+        return self._delete('/config/keyword/%s' % base.get_id(keyword))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

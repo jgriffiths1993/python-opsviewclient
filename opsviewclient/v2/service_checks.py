@@ -28,15 +28,15 @@ class ServiceCheckManager(base.Manager):
     resource_class = ServiceCheck
 
     def get(self, check):
-        return self._get('/config/servicecheck/%s' % get_id(check))
+        return self._get('/config/servicecheck/%s' % base.get_id(check))
 
     def delete(self, check):
-        return self._delete('/config/servicecheck/%s' % get_id(check))
+        return self._delete('/config/servicecheck/%s' % base.get_id(check))
 
     def update(self, check, **kwds):
         body = check._info
         body.update(kwds)
-        return self._update('/config/servicecheck/%s' % get_id(check))
+        return self._update('/config/servicecheck/%s' % base.get_id(check))
 
     def create(self, name, plugin, alert_from_failure=None, args=None,
                attribute=None, calculated_rate=None, cascaded_from=None,

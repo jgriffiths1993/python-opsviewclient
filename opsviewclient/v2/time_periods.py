@@ -25,10 +25,10 @@ class TimePeriodManager(base.Manager):
     resource_class = TimePeriod
 
     def get(self, time_period):
-        return self._get('/config/timeperiod/%s' % get_id(time_period))
+        return self._get('/config/timeperiod/%s' % base.get_id(time_period))
 
     def delete(self, time_period):
-        return self._delete('/config/timeperiod/%s' % get_id(time_period))
+        return self._delete('/config/timeperiod/%s' % base.get_id(time_period))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

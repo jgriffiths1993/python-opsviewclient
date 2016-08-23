@@ -25,10 +25,10 @@ class AttributeManager(base.Manager):
     resource_class = Attribute
 
     def get(self, attribute):
-        return self._get('/config/attribute/%s' % get_id(attribute))
+        return self._get('/config/attribute/%s' % base.get_id(attribute))
 
     def delete(self, attribute):
-        return self._delete('/config/attribute/%s' % get_id(profile))
+        return self._delete('/config/attribute/%s' % base.get_id(profile))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

@@ -28,15 +28,15 @@ class HostGroupManager(base.Manager):
     resource_class = HostGroup
 
     def get(self, group):
-        return self._get('/config/hostgroup/%s' % get_id(group))
+        return self._get('/config/hostgroup/%s' % base.get_id(group))
 
     def delete(self, group):
-        return self._delete('/config/hostgroup/%s' % get_id(group))
+        return self._delete('/config/hostgroup/%s' % base.get_id(group))
 
     def update(self, group, **kwds):
         body = group._info
         body.update(kwds)
-        return self._update('/config/hostgroup/%s' % get_id(group), body=body)
+        return self._update('/config/hostgroup/%s' % base.get_id(group), body=body)
 
     def create(self, name, children=None, hosts=None, parent=None):
         body = {'name': name}

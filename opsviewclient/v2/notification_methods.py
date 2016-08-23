@@ -25,10 +25,10 @@ class NotificationMethodManager(base.Manager):
     resource_class = NotificationMethod
 
     def get(self, method):
-        return self._get('/config/notificationmethod/%s' % get_id(method))
+        return self._get('/config/notificationmethod/%s' % base.get_id(method))
 
     def delete(self, method):
-        return self._delete('/config/notificationmethod/%s' % get_id(method))
+        return self._delete('/config/notificationmethod/%s' % base.get_id(method))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

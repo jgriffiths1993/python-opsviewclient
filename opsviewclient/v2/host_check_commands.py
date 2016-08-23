@@ -25,10 +25,10 @@ class HostCheckCommandManager(base.Manager):
     resource_class = HostCheckCommand
 
     def get(self, command):
-        return self._get('/config/hostcheckcommand/%s' % get_id(command))
+        return self._get('/config/hostcheckcommand/%s' % base.get_id(command))
 
     def delete(self, command):
-        return self._delete('/config/hostcheckcommand/%s' % get_id(command))
+        return self._delete('/config/hostcheckcommand/%s' % base.get_id(command))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

@@ -25,10 +25,10 @@ class ContactManager(base.Manager):
     resource_class = Contact
 
     def get(self, contact):
-        return self._get('/config/contact/%s' % get_id(contact))
+        return self._get('/config/contact/%s' % base.get_id(contact))
 
     def delete(self, contact):
-        return self._delete('/config/contact/%s' % get_id(contact))
+        return self._delete('/config/contact/%s' % base.get_id(contact))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

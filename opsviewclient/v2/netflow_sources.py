@@ -25,10 +25,10 @@ class NetflowSourceManager(base.Manager):
     resource_class = NetflowSource
 
     def get(self, source):
-        return self._get('/config/netflowsource/%s' % get_id(source))
+        return self._get('/config/netflowsource/%s' % base.get_id(source))
 
     def delete(self, source):
-        return self._delete('/config/netflowsource/%s' % get_id(source))
+        return self._delete('/config/netflowsource/%s' % base.get_id(source))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

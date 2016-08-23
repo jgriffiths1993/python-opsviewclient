@@ -28,10 +28,10 @@ class MonitoringServerManager(base.Manager):
     resource_class = MonitoringServer
 
     def get(self, server):
-        return self._get('/config/monitoringserver/%s' % get_id(server))
+        return self._get('/config/monitoringserver/%s' % base.get_id(server))
 
     def delete(self, server):
-        return self._delete('/config/monitoringserver/%s' % get_id(server))
+        return self._delete('/config/monitoringserver/%s' % base.get_id(server))
 
     def update(self, server, **kwds):
         body = server._info
@@ -48,7 +48,7 @@ class MonitoringServerManager(base.Manager):
 
             body['nodes'] = ok_nodes
 
-        return self._update('/config/monitoringserver/%s' % get_id(server),
+        return self._update('/config/monitoringserver/%s' % base.get_id(server),
                             body=body)
 
     def create(self, name, active=None, nodes=None, passive=None,

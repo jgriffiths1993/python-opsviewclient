@@ -28,12 +28,12 @@ class ServiceGroupManager(base.Manager):
     resource_class = ServiceGroup
 
     def get(self, group):
-        return self._get('/config/servicegroup/%s' % get_id(group))
+        return self._get('/config/servicegroup/%s' % base.get_id(group))
 
     def update(self, group, **kwds):
         body = group._info
         body.update(kwds)
-        return self._update('/config/servicegroup/%s' % get_id(group),
+        return self._update('/config/servicegroup/%s' % base.get_id(group),
                             body=body)
 
     def create(self, name, servicechecks=None):
@@ -48,7 +48,7 @@ class ServiceGroupManager(base.Manager):
         return self._create('/config/servicegroup', body=body)
 
     def delete(self, group):
-        return self._delete('/config/servicegroup/%s' % get_id(group))
+        return self._delete('/config/servicegroup/%s' % base.get_id(group))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

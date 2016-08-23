@@ -28,10 +28,10 @@ class HostManager(base.Manager):
     resource_class = Host
 
     def get(self, host):
-        return self._get('/config/host/%s' % get_id(host))
+        return self._get('/config/host/%s' % base.get_id(host))
 
     def delete(self, host):
-        return self._delete('/config/host/%s' % get_id(host))
+        return self._delete('/config/host/%s' % base.get_id(host))
 
     def list(self, rows='all', page=None, cols=None, order=None,
              search=None, in_use=None, is_parent=None, include_ms=None,
@@ -84,7 +84,7 @@ class HostManager(base.Manager):
     def update(self, host, **kwds):
         body = host._info
         body.update(kwds)
-        return self._update('/config/host/%s' % get_id(host), body=body)
+        return self._update('/config/host/%s' % base.get_id(host), body=body)
 
     def create(self, name, address, alias=None, check_attempts=None,
                check_command=None, check_interval=None, check_period=None,

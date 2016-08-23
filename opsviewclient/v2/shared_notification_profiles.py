@@ -26,11 +26,11 @@ class SharedNotificationProfileManager(base.Manager):
 
     def get(self, profile):
         return self._get('/config/sharednotificationprofile/%s' %
-                         get_id(profile))
+                         base.get_id(profile))
 
     def delete(self, profile):
         return self._delete('/config/sharednotificationprofile/%s' %
-                            get_id(profile))
+                            base.get_id(profile))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

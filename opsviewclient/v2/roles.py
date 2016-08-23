@@ -25,10 +25,10 @@ class RoleManager(base.Manager):
     resource_class = Role
 
     def get(self, role):
-        return self._get('/config/role/%s' % get_id(role))
+        return self._get('/config/role/%s' % base.get_id(role))
 
     def delete(self, role):
-        return self._delete('/config/role/%s' % get_id(role))
+        return self._delete('/config/role/%s' % base.get_id(role))
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):
