@@ -8,6 +8,7 @@ try:
 except ImportError:
     import json
 
+from opsviewclient import exceptions as exc
 from opsviewclient.v2 import (
     contacts,
     hosts,
@@ -114,7 +115,8 @@ class Client(object):
                                          data=json.dumps(data), params=params)
 
         if response.status_code not in expected:
-            raise OpsviewClientException('Unexpected response: ', response.text)
+            raise exc.OpsviewClientException('Unexpected response: ',
+                                             response.text)
 
         return response.json()
 
