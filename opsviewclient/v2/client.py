@@ -111,8 +111,11 @@ class Client(object):
 
     def _request(self, method, path, data=None, params=None, expected=[200]):
 
+        if data is not None:
+            data = json.dumps(data)
+
         response = self._session.request(method=method, url=self._url(path),
-                                         data=json.dumps(data), params=params)
+                                         data=data, params=params)
 
         if response.status_code not in expected:
             raise exc.OpsviewClientException('Unexpected response: ',
