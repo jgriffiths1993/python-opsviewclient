@@ -139,19 +139,32 @@ class Manager(object):
 
         return self.resource_class(self, body['object'], loaded=True)
 
-    def _create(self, url, body, return_raw=False, **kwargs):
-        body = self.api.post(url, data=body)
+    def _create(self, url, body, return_raw=False, params=None, **kwargs):
+        body = self.api.post(url, data=body, params=params)
+
+        if 'object' in body:
+            body = body['object']
+        elif 'list' in body:
+            body = body['list']
 
         if return_raw:
-            return body['object']
+            return body
 
-        return self.resource_class(self, body['object'])
+        if isinstance(body, list):
+            return [self.resource_class(self, o) for o in body]
 
-    def _update(self, url, body, **kwargs):
-        body = self.api.put(url, data=body)
+        return self.resource_class(self, body)
+
+    def _update(self, url, body, params=None, **kwargs):
+        body = self.api.put(url, data=body, params=params)
+
+        if 'object' in body:
+            body = body['object']
+        elif 'list' in body:
+            body = body['list']
 
         if body:
-            return self.resource_class(self, body['object'])
+            return self.resource_class(self, body)
         else:
             return body
 
