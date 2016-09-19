@@ -81,10 +81,18 @@ class HostManager(base.Manager):
 
         return self._list('/config/host%s' % qstring)
 
-    def update(self, host, **kwds):
+    def update(self, host, params=None, **kwds):
         body = host._info
         body.update(kwds)
-        return self._update('/config/host/%s' % base.get_id(host), body=body)
+        return self._update('/config/host/%s' % base.get_id(host),
+                            body=body, params=params)
+
+    def create_many(self, _list, params=None):
+        if isinstance(_list, list):
+            _list = {'list': _list}
+
+        return self._create('/config/host', body=_list, params=params,
+                            return_raw=True)
 
     def create(self, name, address, alias=None, check_attempts=None,
                check_command=None, check_interval=None, check_period=None,
@@ -100,7 +108,8 @@ class HostManager(base.Manager):
                snmp_extended_throughput_data=None, snmp_max_msg_size=None,
                snmp_port=None, snmp_version=None, snmpv3_authprotocol=None,
                snmpv3_privprotocol=None, snmpv3_username=None,
-               tidy_ifdescr_level=None, use_rancid=None):
+               tidy_ifdescr_level=None, use_rancid=None, params=None,
+               body_only=False):
 
         body = {
             'name': name,
@@ -133,7 +142,8 @@ class HostManager(base.Manager):
                 base.fmt_str(event_handler_always_exec)
 
         if flap_detection_enabled is not None:
-            body['flap_detection_enabled'] = base.fmt_str(flap_detection_enabled)
+            body['flap_detection_enabled'] = \
+                base.fmt_str(flap_detection_enabled)
 
         if hostattributes is not None:
             if not isinstance(hostattributes, list):
@@ -248,4 +258,7 @@ class HostManager(base.Manager):
         if use_rancid is not None:
             body['use_rancid'] = base.fmt_str(use_rancid)
 
-        return self._create('/config/host', body=body)
+        if body_only:
+            return body
+
+        return self._create('/config/host', body=body, params=params)
