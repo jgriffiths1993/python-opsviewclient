@@ -67,7 +67,8 @@ class HostTemplateManager(base.Manager):
     def update(self, template, **kwds):
         body = template._info
         body.update(kwds)
-        self._update('/config/hosttemplate/%s' % base.get_id(template), body=body)
+        self._update('/config/hosttemplate/%s' % base.get_id(template),
+                     body=body)
 
     def delete(self, template):
         return self._delete('/config/hosttemplate/%s' % base.get_id(template))
