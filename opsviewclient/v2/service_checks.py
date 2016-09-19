@@ -36,22 +36,46 @@ class ServiceCheckManager(base.Manager):
     def update(self, check, **kwds):
         body = check._info
         body.update(kwds)
-        return self._update('/config/servicecheck/%s' % base.get_id(check))
+        return self._update('/config/servicecheck/%s' % base.get_id(check),
+                            body=body)
 
-    def create(self, name, plugin, alert_from_failure=None, args=None,
-               attribute=None, calculated_rate=None, cascaded_from=None,
-               check_attempts=None, check_freshness=None, check_interval=None,
-               check_period=None, checktype=None, critical_comparison=None,
-               critical_value=None, dependencies=None, description=None,
-               event_handler=None, event_handler_always_exec=None,
-               flap_detection_enabled=None, freshness_type=None, hosts=None,
-               hosttemplates=None, invertresults=None, keywords=None,
-               label=None, markdown_filter=None, notification_interval=None,
-               notification_options=None, notification_period=None, oid=None,
-               retry_check_interval=None, sensitive_arguments=None,
-               servicegroup=None, snmptraprules=None, stale_state=None,
-               stale_text=None, stale_threshold_seconds=None, stalking=None,
-               volatile=None, warning_comparison=None, warning_value=None):
+    def create(self, name, plugin, servicegroup,
+               checktype='Active Plugin', args=None,
+               notification_options='w,c,r,u,f',
+               retry_check_interval=60,
+               sensitive_arguments=True,
+               check_interval=300,
+               invertresults=False,
+               stale_threshold_seconds=3600,
+               check_attempts=3,
+               alert_from_failure=None,
+               attribute=None,
+               calculated_rate=None,
+               cascaded_from=None,
+               check_freshness=None,
+               check_period=None,
+               critical_comparison=None,
+               critical_value=None,
+               dependencies=None,
+               description=None,
+               event_handler=None,
+               event_handler_always_exec=None,
+               flap_detection_enabled=None,
+               freshness_type=None, hosts=None,
+               hosttemplates=None,
+               keywords=None,
+               label=None,
+               markdown_filter=None,
+               notification_interval=None,
+               notification_period=None,
+               oid=None,
+               snmptraprules=None, stale_state=None,
+               stale_text=None,
+               stalking=None,
+               volatile=None,
+               warning_comparison=None,
+               warning_value=None
+               ):
 
         body = {
             'name': name,
@@ -111,7 +135,8 @@ class ServiceCheckManager(base.Manager):
                 base.fmt_str(event_handler_always_exec)
 
         if flap_detection_enabled is not None:
-            body['flap_detection_enabled'] = base.fmt_str(flap_detection_enabled)
+            body['flap_detection_enabled'] = \
+                base.fmt_str(flap_detection_enabled)
 
         if freshness_type is not None:
             body['freshness_type'] = freshness_type
@@ -177,7 +202,8 @@ class ServiceCheckManager(base.Manager):
             body['stale_text'] = stale_text
 
         if stale_threshold_seconds is not None:
-            body['stale_threshold_seconds'] = base.fmt_str(stale_threshold_seconds)
+            body['stale_threshold_seconds'] = \
+                base.fmt_str(stale_threshold_seconds)
 
         if stalking is not None:
             body['stalking'] = base.fmt_str(stalking)
