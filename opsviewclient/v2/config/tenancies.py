@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import six
 from six.moves.urllib import parse
 
 try:
@@ -9,9 +10,37 @@ except ImportError:
     import json
 
 from opsviewclient import base
+from opsviewclient.fields import (
+    FieldTypes as FT,
+    FieldAttributes as FA
+)
 
 
 class Tenancy(base.Resource):
+    """
+    {
+        "description": "Customer: Google.com users",
+        "id": "1",
+        "name": "Google.com",
+        "primary_role": {
+            "name": "Google",
+            "ref": "/rest/config/role/53"
+        },
+        "priority": "0",
+        "ref": "/rest/config/tenancy/1"
+    }
+    """
+
+    @property
+    def primary_role(self):
+        if not self._info.get('primary_role'):
+            return
+
+        if not self.manager:
+            return self._info['primary_role']
+
+        pr_id = base.id_from_ref(self._info['primary_role'])
+        return self.manager.client.config.roles.get(pr_id)
 
     def __repr__(self):
         return '<Tenancy: %s>' % self.name
@@ -29,6 +58,8 @@ class TenancyManager(base.Manager):
 
     def delete(self, tenancy):
         return self._delete('/config/tenancy/%s' % base.get_id(tenancy))
+
+    # def create(self, name, description=None, )
 
     def list(self, rows='all', page=None, cols=None, order=None, search=None,
              in_use=None, kwds=None):

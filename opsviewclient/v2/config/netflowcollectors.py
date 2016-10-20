@@ -10,6 +10,7 @@ except ImportError:
 
 from opsviewclient import base
 
+# TODO: fix url
 
 class NetflowCollector(base.Resource):
 

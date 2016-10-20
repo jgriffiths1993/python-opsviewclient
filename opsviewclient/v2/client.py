@@ -9,25 +9,7 @@ except ImportError:
     import json
 
 from opsviewclient import exceptions as exc
-from opsviewclient.v2 import (
-    contacts,
-    hosts,
-    roles,
-    service_checks,
-    host_templates,
-    attributes,
-    time_periods,
-    host_groups,
-    service_groups,
-    notification_methods,
-    host_check_commands,
-    keywords,
-    shared_notification_profiles,
-    monitoring_servers,
-    netflow_collectors,
-    netflow_sources,
-    tenancies
-)
+from opsviewclient.v2.config import Client as ConfigClient
 
 
 class Client(object):
@@ -37,49 +19,24 @@ class Client(object):
         'Content-Type': 'application/json',
     }
 
-    def __init__(self, username, password, endpoint):
+    def __init__(self, endpoint, username=None, password=None, token=None):
         if endpoint[-1] == '/':
             self.base_url = endpoint
         else:
             self.base_url = endpoint + '/'
 
+        if not (username and (token or password)):
+            raise exc.OpsviewClientException('Must specify username and either '
+                                             'token or password')
+
+        self.token = token
         self._username = username
         self._password = password
-
-        self._auth_failed = False
 
         self._session = requests.Session()
         self._session.headers = Client._default_headers
 
-        self.contacts = contacts.ContactManager(self)
-        self.hosts = hosts.HostManager(self)
-        self.roles = roles.RoleManager(self)
-        self.service_checks = service_checks.ServiceCheckManager(self)
-        self.host_templates = host_templates.HostTemplateManager(self)
-        self.attributes = attributes.AttributeManager(self)
-        self.time_periods = time_periods.TimePeriodManager(self)
-        self.host_groups = host_groups.HostGroupManager(self)
-        self.service_groups = service_groups.ServiceGroupManager(self)
-        self.notification_methods = \
-            notification_methods.NotificationMethodManager(self)
-
-        self.host_check_commands = \
-            host_check_commands.HostCheckCommandManager(self)
-
-        self.keywords = keywords.KeywordManager(self)
-        self.shared_notification_profiles = \
-            shared_notification_profiles.SharedNotificationProfileManager(self)
-
-        self.monitoring_servers = \
-            monitoring_servers.MonitoringServerManager(self)
-
-        self.netflow_collectors = \
-            netflow_collectors.NetflowCollectorManager(self)
-
-        self.netflow_sources = \
-            netflow_sources.NetflowSourceManager(self)
-
-        self.tenancies = tenancies.TenancyManager(self)
+        self.config = ConfigClient(self)
 
         self._authenticate()
 
@@ -88,20 +45,22 @@ class Client(object):
         self._session.headers.pop('X-Opsview-Username', None)
         self._session.headers.pop('X-Opsview-Token', None)
 
-        payload = {
-            'username': self._username,
-            'password': self._password,
-        }
+        if self._username and self._password:
+            payload = {
+                'username': self._username,
+                'password': self._password,
+            }
+            response = self._request('POST', 'login', data=payload)
 
-        response = self._request('POST', 'login', data=payload)
+            try:
+                token = response['token']
+            except Exception as e:
+                raise e
 
-        try:
-            token = response['token']
-        except Exception as e:
-            raise e
+            self.token = token
 
         self._session.headers['X-Opsview-Username'] = self._username
-        self._session.headers['X-Opsview-Token'] = token
+        self._session.headers['X-Opsview-Token'] = self.token
 
     def _url(self, path):
         if path[0] == '/':
@@ -135,5 +94,15 @@ class Client(object):
     def delete(self, url, **kwds):
         return self._request('DELETE', url, **kwds)
 
-    def reload(self):
-        return self.post('/reload')
+    def reload(self, asynchronous=False):
+        params = {}
+        if asynchronous:
+            params['asynchronous'] = 1
+
+        return self.post('/reload', params=params)
+
+    def reload_status(self):
+        return self.get('/reload')
+
+    def info(self):
+        return self.get('/info')

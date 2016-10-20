@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import six
 from six.moves.urllib import parse
 
 try:
@@ -9,9 +10,164 @@ except ImportError:
     import json
 
 from opsviewclient import base
+from opsviewclient.fields import (
+    FieldTypes as FT,
+    FieldAttributes as FA
+)
 
 
 class ServiceCheck(base.Resource):
+    """
+    {
+        "alert_from_failure": "1",
+        "args": "-H $HOSTADDRESS$  -p %NRPE_PORT%  -c check_disk",
+        "attribute": null,
+        "calculate_rate": "",
+        "cascaded_from": null,
+        "check_attempts": "3",
+        "check_freshness": "0",
+        "check_interval": "5",
+        "check_period": {
+            "name": "24x7",
+            "ref": "/rest/config/timeperiod/1"
+        },
+        "checktype": {
+            "name": "Active Plugin",
+            "ref": "/rest/config/checktype/1"
+        },
+        "critical_comparison": null,
+        "critical_value": null,
+        "dependencies": [
+            {
+                "name": "Opsview Agent",
+                "ref": "/rest/config/servicecheck/150"
+            }
+        ],
+        "description": "Utilisation of / partition",
+        "event_handler": "",
+        "flap_detection_enabled": "1",
+        "freshness_type": "renotify",
+        "hosts": [
+            {
+                "name": "bob",
+                "ref": "/rest/config/host/63"
+            },
+            {
+                "name": "bucks",
+                "ref": "/rest/config/host/515"
+            },
+            {
+                "name": "kielder2",
+                "ref": "/rest/config/host/249"
+            },
+            {
+                "name": "kielder3",
+                "ref": "/rest/config/host/426"
+            },
+            {
+                "name": "My_Box",
+                "ref": "/rest/config/host/371"
+            },
+            {
+                "name": "My_Box2",
+                "ref": "/rest/config/host/422"
+            },
+            {
+                "name": "opsview",
+                "ref": "/rest/config/host/509"
+            },
+            {
+                "name": "opsviewA",
+                "ref": "/rest/config/host/481"
+            },
+            {
+                "name": "opsviewB",
+                "ref": "/rest/config/host/1"
+            },
+            {
+                "name": "ov-dev-61",
+                "ref": "/rest/config/host/200"
+            }
+        ],
+        "hosttemplates": [
+            {
+                "name": "buildbot-builders",
+                "ref": "/rest/config/hosttemplate/11"
+            },
+            {
+                "name": "Nagios Base Checks",
+                "ref": "/rest/config/hosttemplate/139"
+            },
+            {
+                "name": "Obs-Check",
+                "ref": "/rest/config/hosttemplate/77"
+            },
+            {
+                "name": "Opsview - Master Monitoring Server",
+                "ref": "/rest/config/hosttemplate/2"
+            },
+            {
+                "name": "Opsview - Slave Monitoring Server",
+                "ref": "/rest/config/hosttemplate/17"
+            },
+            {
+                "name": "OS - Linux",
+                "ref": "/rest/config/hosttemplate/10"
+            },
+            {
+                "name": "OS - Unix Base",
+                "ref": "/rest/config/hosttemplate/55"
+            }
+        ],
+        "id": "45",
+        "invertresults": "0",
+        "keywords": [
+            {
+                "name": "Jeremy",
+                "ref": "/rest/config/keyword/111"
+            },
+            {
+                "name": "Michaell",
+                "ref": "/rest/config/keyword/107"
+            },
+            {
+                "name": "report-facets-core",
+                "ref": "/rest/config/keyword/112"
+            },
+            {
+                "name": "Test_JB_NRPE",
+                "ref": "/rest/config/keyword/110"
+            }
+        ],
+        "label": null,
+        "markdown_filter": "0",
+        "name": "/",
+        "notification_interval": null,
+        "notification_options": "w,c,r",
+        "notification_period": null,
+        "oid": null,
+        "plugin": {
+            "name": "check_nrpe",
+            "ref": "/rest/config/plugin/check_nrpe"
+        },
+        "ref": "/rest/config/servicecheck/45",
+        "retry_check_interval": "1",
+        "sensitive_arguments": "1",
+        "servicegroup": {
+            "name": "OS - Base Unix Agent",
+            "ref": "/rest/config/servicegroup/70"
+        },
+        "snmptraprules": [],
+        "stale_state": "0",
+        "stale_text": "",
+        "stale_threshold_seconds": "3600",
+        "stalking": null,
+        "uncommitted": "0",
+        "volatile": "0",
+        "warning_comparison": null,
+        "warning_value": null
+    }
+    """
 
     def __repr__(self):
         return '<ServiceCheck: %s>' % self.name

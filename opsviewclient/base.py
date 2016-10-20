@@ -3,6 +3,8 @@
 
 import copy
 import six
+from opsviewclient.fields import FieldAttributes as FA
+from opsviewclient.conv import field_encodings
 
 
 def get_id(obj):
@@ -21,6 +23,9 @@ def id_from_ref(obj):
 
 def nameref(name):
     """Returns a reference to a name as {'name': name}"""
+    if name is None:
+        return None
+
     if isinstance(name, Resource) and hasattr(name, 'name'):
         return {'name': getattr(name, 'name')}
 
@@ -67,7 +72,7 @@ class Resource(object):
     def set_loaded(self, val):
         self._loaded = val
 
-    def to_dict(self):
+    def as_dict(self):
         return copy.deepcopy(self._info)
 
     def __eq__(self, other):
@@ -83,23 +88,91 @@ class Resource(object):
         return self._info == other._info
 
     def _add_details(self, info):
+        info = self._decode(info)
         for (k, v) in six.iteritems(info):
             try:
-                setattr(self, k, v)
+                # setattr(self, k, v)
                 self._info[k] = v
             except AttributeError:
                 pass
 
+    def copy(self):
+        cpy = self.as_dict()
+        return self.__class__(self.manager, info=cpy, loaded=True)
+
+    def encoded(self):
+        return self._encode(self.as_dict())
+
+    def decoded(self):
+        return self._decode(self.as_dict())
+
+    @classmethod
+    def _encode(cls, obj):
+        fields = getattr(cls, '_fields_', None)
+        field_attrs = getattr(cls, '_field_attributes_', None)
+
+        if not fields and not field_attrs:
+            return obj
+
+        for (k, v) in six.iteritems(dict(obj)):
+            if fields:
+                if k in fields and fields[k] in field_encodings:
+                    obj[k] = field_encodings[fields[k]].encode(v)
+
+            if field_attrs:
+                attrs = field_attrs.get(k, None)
+                if not attrs:
+                    continue
+
+                if attrs & FA.OMIT_NONE == FA.OMIT_NONE:
+                    if v is None:
+                        del obj[k]
+
+                if attrs & FA.OMIT_EMPTY == FA.OMIT_EMPTY:
+                    if not v:
+                        del obj[k]
+
+                if attrs & FA.READONLY == FA.READONLY:
+                    del obj[k]
+
+        return obj
+
+    @classmethod
+    def _decode(cls, obj):
+        fields = getattr(cls, '_fields_', None)
+
+        if not fields:
+            return obj
+
+        for (k, v) in six.iteritems(obj):
+            if k in fields and fields[k] in field_encodings:
+                obj[k] = field_encodings[fields[k]].decode(v)
+
+        return obj
+
     def __getattr__(self, k):
-        if k not in self.__dict__:
-            if not self.is_loaded():
-                self.get()
-                return self.__getattr__(k)
+        keymap = None
 
-            raise AttributeError(k)
+        if '_field_map_' in self.__dict__:
+            keymap = self.__dict__['_field_map_']
 
-        else:
+        if k in self.__dict__:
             return self.__dict__[k]
+
+        if not self.is_loaded():
+            self.get()
+            return self.__getattr__(k)
+
+        if k in self._info:
+            return self._info[k]
+
+        # Maybe we use a different name for the field than the Opsview API does
+        # (e.g. to mask the API's inconsistent use of underscores)
+        if keymap and k in keymap and keymap[k] in self._info:
+            api_key = keymap[k]
+            return self._info[api_key]
+
+        raise AttributeError(k)
 
     def get(self):
         self.set_loaded(True)
@@ -109,6 +182,13 @@ class Resource(object):
         new = self.manager.get(self.id)
         if new:
             self._add_details(new._info)
+
+    def delete(self):
+        if not hasattr(self.manager, 'delete'):
+            raise NotImplemented('Delete not implemented for type: %s' %
+                                 self.__class__.__name__)
+
+        return self.manager.delete(self)
 
 
 class Manager(object):
@@ -134,8 +214,8 @@ class Manager(object):
 
         return items
 
-    def _get(self, url):
-        body = self.api.get(url)
+    def _get(self, url, params=None):
+        body = self.api.get(url, params=params)
 
         return self.resource_class(self, body['object'], loaded=True)
 
