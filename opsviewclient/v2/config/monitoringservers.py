@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+from __future__ import print_function
 
 import six
 from six.moves.urllib import parse
@@ -46,11 +47,38 @@ class MonitoringServer(base.Resource):
 
     @property
     def monitors(self):
-        pass
+        if not self._info.get('monitors'):
+            return
 
+        if not self.manager:
+            for h in self._info['monitors']:
+                yield h
+        else:
+            for h in self._info['monitors']:
+                h_id = base.id_from_ref(h)
+                yield self.manager.client.config.hosts.get(h_id)
+
+    # TODO(jg): find some clever way to get the host ref
     @property
     def nodes(self):
-        pass
+        if not self._info.get('nodes'):
+            return
+
+        for node in self._info['nodes']:
+            yield node
+
+    @property
+    def roles(self):
+        if not self._info.get('roles'):
+            return
+
+        if not self.manager:
+            for r in self._info['roles']:
+                yield r
+        else:
+            for r in self._info['roles']:
+                r_id = base.id_from_ref(r)
+                yield self.manager.client.config.roles.get(r_id)
 
     def __repr__(self):
         return '<MonitoringServer: %s>' % self.name

@@ -82,9 +82,9 @@ class Role(base.Resource):
     }
 
     _field_attributes_ = {
-        "access_hostgroups": FA.OMIT_NONE,
-        "access_keywords": FA.OMIT_NONE,
-        "access_servicegroups": FA.OMIT_NONE,
+        "access_hostgroups": FA.OMIT_EMPTY,
+        "access_keywords": FA.OMIT_EMPTY,
+        "access_servicegroups": FA.OMIT_EMPTY,
         "accesses": FA.OMIT_NONE,
         "all_bsm_components": FA.OMIT_NONE,
         "all_bsm_edit": FA.OMIT_NONE,
@@ -97,7 +97,7 @@ class Role(base.Resource):
         "description": FA.OMIT_NONE,
         "hostgroups": FA.OMIT_NONE,
         "id": FA.READONLY,
-        "monitoringservers": FA.OMIT_NONE,
+        "monitoringservers": FA.OMIT_EMPTY,
         "ref": FA.READONLY,
         "tenancy": FA.OMIT_NONE,
         "uncommitted": FA.READONLY,
@@ -203,9 +203,9 @@ class RoleManager(base.Manager):
     resource_class = Role
 
     def create(self, name, description=None, permissions=None,
-               hostgroups=None, all_hostgroups=False,
+               host_groups=None, all_host_groups=False,
                keywords=None, all_keywords=False,
-               service_groups=None, all_servicegroups=False,
+               service_groups=None, all_service_groups=False,
                monitoring_servers=None, all_monitoring_servers=False,
                all_bsm_components=False, all_bsm_edit=False, all_bsm_view=False,
                contacts=None, tenancy=None, params=None, body_only=False):
@@ -213,9 +213,9 @@ class RoleManager(base.Manager):
         body = {
             'name': name,
             'description': description,
-            'all_hostgroups': all_hostgroups,
+            'all_hostgroups': all_host_groups,
             'all_keywords': all_keywords,
-            'all_servicegroups': all_servicegroups,
+            'all_servicegroups': all_service_groups,
             'all_monitoringservers': all_monitoring_servers,
             'all_bsm_components': all_bsm_components,
             'all_bsm_edit': all_bsm_edit,
@@ -224,9 +224,9 @@ class RoleManager(base.Manager):
         }
 
         body['access_hostgroups'] = (
-            [base.nameref(hg) for hg in hostgroups]
-            if isinstance(hostgroups, list) else
-            [base.nameref(hostgroups)]
+            [base.nameref(hg) for hg in host_groups]
+            if isinstance(host_groups, list) else
+            [base.nameref(host_groups)]
         )
 
         body['access_keywords'] = (

@@ -180,8 +180,8 @@ class ContactManager(base.Manager):
     def create(self, name, description=None, password=None,
                encrypted_password=None, full_name=None, language=None,
                notification_profiles=None, realm=None, role=None,
-               shared_notification_profiles=None, uncommitted=None,
-               variables=None, params=None, body_only=None):
+               shared_notification_profiles=None, variables=None,
+               params=None, body_only=False):
 
         body = {
             'name': name,
@@ -245,6 +245,20 @@ class ContactManager(base.Manager):
             if k in kwds:
                 kwds[v] = kwds[k]
                 del kwds[k]
+
+        if 'role' in kwds:
+            kwds['role'] = base.nameref(kwds['role'])
+
+        if 'sharednotificationprofiles' in kwds:
+            kwds['role'] = (
+                [base.nameref(x) for x in kwds['sharednotificationprofiles']]
+                if isinstance(kwds['sharednotificationprofiles'], list) else
+                (base.nameref(kwds['sharednotificationprofiles']))
+            )
+
+        if 'variables' in kwds:
+            if not isinstance(kwds['variables'], list):
+                kwds['variables'] = [kwds['variables']]
 
         new_contact = contact.copy()
         new_contact._info.update(kwds)

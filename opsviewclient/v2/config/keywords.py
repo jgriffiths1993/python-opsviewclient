@@ -48,7 +48,8 @@ class Keyword(base.Resource):
     """
 
     _field_map_ = {
-        'service_checks': 'servicechecks'
+        'all_service_checks': 'all_servicechecks',
+        'service_checks': 'servicechecks',
     }
 
     _fields_ = {
@@ -126,7 +127,7 @@ class KeywordManager(base.Manager):
     def get(self, keyword):
         return self._get('/config/keyword/%s' % base.get_id(keyword))
 
-    def create(self, name, all_hosts=None, all_servicechecks=None,
+    def create(self, name, all_hosts=None, all_service_checks=None,
                description=None, enabled=True, exclude_handled=None,
                hosts=None, public=None, roles=None, service_checks=None,
                show_contextual_menus=None, style=None,
@@ -135,7 +136,7 @@ class KeywordManager(base.Manager):
         body = {
             'name': name,
             'all_hosts': all_hosts,
-            'all_servicechecks': all_servicechecks,
+            'all_servicechecks': all_service_checks,
             'description': description,
             'enabled': enabled,
             'exclude_handled': exclude_handled,

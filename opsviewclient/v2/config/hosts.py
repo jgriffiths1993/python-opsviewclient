@@ -469,7 +469,7 @@ class HostManager(base.Manager):
             body['parents'] = [base.nameref(p) for p in parents]
 
         if keywords:
-            if not isinstance(keyword, list):
+            if not isinstance(keywords, list):
                 keywords = [keywords]
 
             body['keywords'] = [base.nameref(k) for k in keywords]
@@ -495,7 +495,7 @@ class HostManager(base.Manager):
         return self._create('/config/host', body=body, params=params)
 
     def update(self, host, force=False, params=None, body_only=False,
-               always_update_passwords=True, **kwds):
+               always_update_passwords=True, check_update=False, **kwds):
 
         if not kwds:
             # Nothing to update
@@ -522,13 +522,29 @@ class HostManager(base.Manager):
                 else [base.nameref(kwds['hosttemplates'])]
             )
 
+        if 'other_addresses' in kwds:
+            kwds['other_addresses'] = (
+                ','.join(kwds['other_addresses'])
+                if isinstance(['other_addresses'], list) else
+                kwds['other_addresses']
+            )
+
         if 'icon' in kwds:
             if isinstance(kwds['icon'], str):
                 key = 'path' if kwds['icon'][0] == '/' else 'name'
-                kwds['icon'] = {key: icon}
+                kwds['icon'] = {
+                    key: kwds['icon']
+                }
 
         if 'keywords' in kwds:
-            kwds['keywords'] = base.nameref(kwds['keywords'])
+            kwds['keywords'] = (
+                [base.nameref(k) for k in kwds['keywords']]
+                if isinstance(kwds['keywords'], list) else
+                [base.nameref(kwds['keywords'])]
+            )
+
+        if 'monitored_by' in kwds:
+            kwds['monitored_by'] = base.nameref(kwds['monitored_by'])
 
         if 'notification_period' in kwds:
             kwds['notification_period'] = \
@@ -544,7 +560,7 @@ class HostManager(base.Manager):
         if 'rancid_vendor' in kwds:
             kwds['rancid_vendor'] = base.nameref(kwds['rancid_vendor'])
 
-        if 'service_checks' in kwds:
+        if 'servicechecks' in kwds:
             scs = kwds['servicechecks']
             if not isinstance(scs, list):
                 scs = [scs]
@@ -591,8 +607,24 @@ class HostManager(base.Manager):
         if body_only:
             return body
 
-        return self._update('/config/host/%s' % base.get_id(host),
-                            body=body, params=params)
+        new_host = self._update('/config/host/%s' % base.get_id(host),
+                                body=body, params=params)
+
+        if not check_update:
+            return new_host
+
+        # Drop the hostattributes key IDs for the comparison as they are
+        # incremented each time
+        cpy1 = host.encoded()
+        cpy2 = new_host.encoded()
+
+        for a in cpy1.get('hostattributes', []):
+            del a['id']
+
+        for a in cpy2.get('hostattributes', []):
+            del a['id']
+
+        return new_host, cmp(cpy1, cpy2) != 0
 
     def list(self, rows='all', page=None, cols=None, order=None,
              search=None, in_use=None, is_parent=None, include_ms=None,
